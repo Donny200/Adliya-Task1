@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: Task1
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/adlita_project1
+    username: postgres
+    password: doniyor2007
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+      hibernate:
+        format_sql: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+
+jwt:
+  secret: ApeVFjUOyTmk7XYwgcYwIEsix1mALAsQhftYQqWHE8P6kcnqbZv0Uxj9HduKEvjXzz0sVYCG0ZjSBtmxadtAiQ==
+  expiration: 86400000
+
+server:
+  port: 8080
