@@ -8,6 +8,7 @@ import adliya.uz.task1.entity.User;
 import adliya.uz.task1.exception.EmailAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,7 +53,12 @@ public class AuthService {
 
     public UserResponse getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new InsufficientAuthenticationException("Authentication is required");
+        }
         User user = userService.getByEmail(authentication.getName());
         return UserResponse.from(user);
     }
+
+
 }

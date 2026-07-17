@@ -13,23 +13,31 @@ public class CookieUtil {
     private final CookieProperties cookieProperties;
     private final JwtProperties jwtProperties;
 
-    public ResponseCookie createAuthCookie(String token) {
-        return ResponseCookie.from(cookieProperties.getName(), token)
-                .httpOnly(true)
-                .secure(cookieProperties.isSecure())
-                .sameSite(cookieProperties.getSameSite())
-                .path("/")
-                .maxAge(Duration.ofMillis(jwtProperties.getExpiration()))
-                .build();
+    public ResponseCookie createAccessCookie(String token) {
+        return build(cookieProperties.getAccessTokenName(), token, "/",
+                Duration.ofMillis(jwtProperties.getExpiration()));
     }
 
-    public ResponseCookie createLogoutCookie() {
-        return ResponseCookie.from(cookieProperties.getName(), "")
+    public ResponseCookie createRefreshCookie(String token) {
+        return build(cookieProperties.getRefreshTokenName(), token, cookieProperties.getRefreshTokenPath(),
+                Duration.ofMillis(jwtProperties.getRefreshExpiration()));
+    }
+
+    public ResponseCookie createLogoutAccessCookie() {
+        return build(cookieProperties.getAccessTokenName(), "", "/", Duration.ZERO);
+    }
+
+    public ResponseCookie createLogoutRefreshCookie() {
+        return build(cookieProperties.getRefreshTokenName(), "", cookieProperties.getRefreshTokenPath(), Duration.ZERO);
+    }
+
+    private ResponseCookie build(String name, String value, String path, Duration maxAge) {
+        return ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .secure(cookieProperties.isSecure())
                 .sameSite(cookieProperties.getSameSite())
-                .path("/")
-                .maxAge(Duration.ZERO)
+                .path(path)
+                .maxAge(maxAge)
                 .build();
     }
 }
