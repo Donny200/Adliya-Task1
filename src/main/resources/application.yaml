@@ -4,7 +4,7 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/adlita_project1
-    username: postgres
+    username:
     password:
     driver-class-name: org.postgresql.Driver
 
@@ -25,13 +25,15 @@ springdoc:
 jwt:
   secret: ApeVFjUOyTmk7XYwgcYwIEsix1mALAsQhftYQqWHE8P6kcnqbZv0Uxj9HduKEvjXzz0sVYCG0ZjSBtmxadtAiQ==
   expiration: 86400000
-
+  refresh-expiration: 604800000
 
 app:
   cookie:
-    name: accessToken
     secure: false
     same-site: Lax
+    access-token-name: accessToken
+    refresh-token-name: refreshToken
+    refresh-token-path: /api/auth
   cors:
     allowed-origins:
       - http://localhost:3000

@@ -6,13 +6,16 @@ import adliya.uz.task1.dto.LoginRequest;
 import adliya.uz.task1.dto.SignupRequest;
 import adliya.uz.task1.dto.UserResponse;
 import adliya.uz.task1.entity.User;
+import adliya.uz.task1.exception.InvalidRefreshTokenException;
 import adliya.uz.task1.service.AuthService;
+import adliya.uz.task1.service.RefreshTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,38 +30,73 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
     private final CookieUtil cookieUtil;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
     public ResponseEntity<UserResponse> signup(@Valid @RequestBody SignupRequest request) {
         User user = authService.signup(request);
-        ResponseCookie cookie = cookieUtil.createAuthCookie(jwtService.generateToken(user));
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(UserResponse.from(user));
+        return withAuthCookies(HttpStatus.CREATED, user);
     }
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request) {
         User user = authService.login(request);
-        ResponseCookie cookie = cookieUtil.createAuthCookie(jwtService.generateToken(user));
+        return withAuthCookies(HttpStatus.OK, user);
+    }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(UserResponse.from(user));
+    @PostMapping("/refresh")
+    public ResponseEntity<Void> refresh(
+            @CookieValue(name = "${app.cookie.refresh-token-name}", required = false) String refreshToken) {
+
+        if (refreshToken == null) {
+            return clearAuthCookies(HttpStatus.UNAUTHORIZED);
+        }
+
+        try {
+            RefreshTokenService.RotationResult result = refreshTokenService.rotate(refreshToken);
+
+            ResponseCookie accessCookie = cookieUtil.createAccessCookie(jwtService.generateToken(result.user()));
+            ResponseCookie refreshCookie = cookieUtil.createRefreshCookie(result.rawToken());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .build();
+        } catch (InvalidRefreshTokenException ex) {
+            return clearAuthCookies(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        ResponseCookie cookie = cookieUtil.createLogoutCookie();
+    public ResponseEntity<Void> logout(
+            @CookieValue(name = "${app.cookie.refresh-token-name}", required = false) String refreshToken) {
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .build();
+        if (refreshToken != null) {
+            refreshTokenService.revoke(refreshToken);
+        }
+
+        return clearAuthCookies(HttpStatus.OK);
     }
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> me() {
         return ResponseEntity.ok(authService.getCurrentUser());
+    }
+
+    private ResponseEntity<UserResponse> withAuthCookies(HttpStatus status, User user) {
+        ResponseCookie accessCookie = cookieUtil.createAccessCookie(jwtService.generateToken(user));
+        ResponseCookie refreshCookie = cookieUtil.createRefreshCookie(refreshTokenService.createRefreshToken(user));
+
+        return ResponseEntity.status(status)
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(UserResponse.from(user));
+    }
+
+    private ResponseEntity<Void> clearAuthCookies(HttpStatus status) {
+        return ResponseEntity.status(status)
+                .header(HttpHeaders.SET_COOKIE, cookieUtil.createLogoutAccessCookie().toString())
+                .header(HttpHeaders.SET_COOKIE, cookieUtil.createLogoutRefreshCookie().toString())
+                .build();
     }
 }
