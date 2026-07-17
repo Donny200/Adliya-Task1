@@ -5,6 +5,7 @@ import adliya.uz.task1.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,5 +24,30 @@ public class UserService {
 
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+
+    public List<User> getAll() {
+        return userRepository.findAll();
+    }
+
+    public User getById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
+
+    public User update(Long id, User userDetails) {
+        User user = getById(id);
+
+        user.setFirstName(userDetails.getFirstName());
+        user.setLastName(userDetails.getLastName());
+        user.setEmail(userDetails.getEmail());
+
+        return userRepository.save(user);
+    }
+
+    public void delete(Long id) {
+        User user = getById(id);
+        userRepository.delete(user);
     }
 }

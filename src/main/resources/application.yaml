@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/adlita_project1
     username: postgres
-    password:
+    password: 12022005
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -39,4 +39,4 @@ app:
 
 
 server:
-  port: 8080
+  port: 8082
