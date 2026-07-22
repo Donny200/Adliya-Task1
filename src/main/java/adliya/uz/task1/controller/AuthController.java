@@ -3,7 +3,6 @@ package adliya.uz.task1.controller;
 import adliya.uz.task1.config.security.CookieUtil;
 import adliya.uz.task1.config.security.JwtService;
 import adliya.uz.task1.dto.LoginRequest;
-import adliya.uz.task1.dto.SignupRequest;
 import adliya.uz.task1.dto.UserResponse;
 import adliya.uz.task1.entity.User;
 import adliya.uz.task1.exception.InvalidRefreshTokenException;
@@ -31,12 +30,6 @@ public class AuthController {
     private final JwtService jwtService;
     private final CookieUtil cookieUtil;
     private final RefreshTokenService refreshTokenService;
-
-    @PostMapping("/signup")
-    public ResponseEntity<UserResponse> signup(@Valid @RequestBody SignupRequest request) {
-        User user = authService.signup(request);
-        return withAuthCookies(HttpStatus.CREATED, user);
-    }
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request) {
