@@ -86,4 +86,10 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(status).body(body);
     }
+
+    @ExceptionHandler(OrganizationAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleOrgAlreadyExists(OrganizationAlreadyExistsException ex) {
+        return build(HttpStatus.CONFLICT, ex.getMessage());
+
+    }
 }

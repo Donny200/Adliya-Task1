@@ -1,10 +1,14 @@
 package adliya.uz.task1.dto;
 
+import adliya.uz.task1.entity.Organization;
 import adliya.uz.task1.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -17,6 +21,8 @@ public class UserResponse {
     private String email;
     private String phone;
     private String role;
+    private Boolean enabled;
+    private Set<Long> organizationIds;
 
     public static UserResponse from(User user) {
         return UserResponse.builder()
@@ -26,6 +32,10 @@ public class UserResponse {
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .role(user.getRole().getName())
+                .enabled(user.getEnabled())
+                .organizationIds(user.getOrganizations().stream()
+                        .map(Organization::getId)
+                        .collect(Collectors.toSet()))
                 .build();
     }
 }

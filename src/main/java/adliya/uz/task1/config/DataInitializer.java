@@ -9,14 +9,13 @@ import adliya.uz.task1.repository.RoleRepository;
 import adliya.uz.task1.repository.UserRepository;
 
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder; // SecurityConfig da yaratilgan bo'lishi kerak
+    private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.roleRepository = roleRepository;
@@ -27,12 +26,10 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        // 1. Rollarni bazaga yozish (agar yo'q bo'lsa)
         List<String> roles = List.of(
                 "ROLE_SUPER_ADMIN",
                 "ROLE_ORG_ADMIN",
-                "ROLE_MODERATOR",
-                "ROLE_USER"
+                "ROLE_MODERATOR"
         );
 
         for (String roleName : roles) {
@@ -44,17 +41,18 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
 
-        String adminEmail = "admin@reestr.uz"; // yoki usernam
-        if (userRepository.findByEmail(adminEmail).isEmpty()) { // User repoda findByEmail yoki findByUsername bo'lishi kerak
+        String adminEmail = "admin@reestr.uz";
+        if (userRepository.findByEmail(adminEmail).isEmpty()) {
 
             Role superAdminRole = roleRepository.findByName("ROLE_SUPER_ADMIN").orElseThrow();
 
-            User superAdmin = new User();
-            superAdmin.setEmail(adminEmail);
-            superAdmin.setPassword(passwordEncoder.encode("admin123")); // Parolni hashlash
-            superAdmin.setRole(superAdminRole);
-            superAdmin.setFirstName("Super");
-            superAdmin.setLastName("Admin");
+            User superAdmin = User.builder()
+                    .email(adminEmail)
+                    .password(passwordEncoder.encode("admin123"))
+                    .role(superAdminRole)
+                    .firstName("Super")
+                    .lastName("Admin")
+                    .build();
             userRepository.save(superAdmin);
             System.out.println("Super Admin muvaffaqiyatli yaratildi! Email: admin@reestr.uz, Parol: admin123");
         }
