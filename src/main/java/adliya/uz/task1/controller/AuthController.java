@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import adliya.uz.task1.dto.ChangePasswordRequest;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -92,4 +94,11 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, cookieUtil.createLogoutRefreshCookie().toString())
                 .build();
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        authService.changePassword(request);
+        return ResponseEntity.ok("Password changed successfully.");
+    }
+
 }

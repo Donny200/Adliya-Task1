@@ -2,6 +2,7 @@ package adliya.uz.task1.controller;
 
 import adliya.uz.task1.dto.CreateOrganizationRequest;
 import adliya.uz.task1.dto.OrganizationResponse;
+import adliya.uz.task1.dto.UpdateOrganizationRequest;
 import adliya.uz.task1.entity.Organization;
 import adliya.uz.task1.service.OrganizationService;
 import jakarta.validation.Valid;
@@ -21,14 +22,14 @@ public class OrganizationController {
     private final OrganizationService organizationService;
 
     @PostMapping
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('ORGANIZATIONS_CREATE')")
     public ResponseEntity<OrganizationResponse> create(@Valid @RequestBody CreateOrganizationRequest request) {
         Organization org = organizationService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(OrganizationResponse.from(org));
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ORGANIZATIONS_VIEW')")
     public ResponseEntity<List<OrganizationResponse>> getAll() {
         List<OrganizationResponse> orgs = organizationService.getAll().stream()
                 .map(OrganizationResponse::from)
@@ -37,8 +38,21 @@ public class OrganizationController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ORGANIZATIONS_VIEW')")
     public ResponseEntity<OrganizationResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(OrganizationResponse.from(organizationService.getById(id)));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ORGANIZATIONS_EDIT')")
+    public ResponseEntity<OrganizationResponse> update(@PathVariable Long id, @Valid @RequestBody UpdateOrganizationRequest request) {
+        return ResponseEntity.ok(OrganizationResponse.from(organizationService.update(id, request)));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ORGANIZATIONS_DEACTIVATE')")
+    public ResponseEntity<String> deactivate(@PathVariable Long id) {
+        organizationService.deactivate(id);
+        return ResponseEntity.ok("Organization deactivated successfully.");
     }
 }

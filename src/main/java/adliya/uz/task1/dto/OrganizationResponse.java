@@ -16,6 +16,7 @@ public class OrganizationResponse {
     private Long id;
     private String name;
     private String description;
+    private Boolean enabled;
     private LocalDateTime createdAt;
 
     public static OrganizationResponse from(Organization org) {
@@ -23,6 +24,7 @@ public class OrganizationResponse {
                 .id(org.getId())
                 .name(org.getName())
                 .description(org.getDescription())
+                .enabled(org.getEnabled())
                 .createdAt(org.getCreatedAt())
                 .build();
     }

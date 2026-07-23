@@ -127,6 +127,7 @@ public class ModeratorService {
                 .collect(Collectors.toSet());
     }
 
+
     private void checkScopeOrThrow(Set<Organization> orgs) {
         User current = userService.getCurrentUser();
         if (isSuperAdmin(current)) return;

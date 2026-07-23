@@ -15,24 +15,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/moderators")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('SUPER_ADMIN','ORG_ADMIN')")
 public class ModeratorController {
 
     private final ModeratorService moderatorService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('MODERATORS_CREATE')")
     public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateModeratorRequest request) {
         User user = moderatorService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.from(user));
     }
 
     @PostMapping("/promote")
+    @PreAuthorize("hasAuthority('MODERATORS_CREATE')")
     public ResponseEntity<UserResponse> promote(@Valid @RequestBody PromoteToModeratorRequest request) {
         User user = moderatorService.promote(request);
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('MODERATORS_VIEW')")
     public ResponseEntity<List<UserResponse>> getAll() {
         List<UserResponse> moderators = moderatorService.getAll().stream()
                 .map(UserResponse::from)
@@ -41,16 +43,19 @@ public class ModeratorController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('MODERATORS_VIEW')")
     public ResponseEntity<UserResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(UserResponse.from(moderatorService.getById(id)));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('MODERATORS_EDIT')")
     public ResponseEntity<UserResponse> update(@PathVariable Long id, @Valid @RequestBody UpdateModeratorRequest request) {
         return ResponseEntity.ok(UserResponse.from(moderatorService.update(id, request)));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('MODERATORS_DEACTIVATE')")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         moderatorService.deactivate(id);
         return ResponseEntity.ok("Moderator deactivated successfully.");

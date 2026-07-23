@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 
 
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -63,5 +64,7 @@ public class UserService {
         }
         return getByEmail(authentication.getName());
     }
+
+
 
 }

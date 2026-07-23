@@ -24,6 +24,7 @@ public class Organization {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private boolean enabled = true;
 
     @Column(nullable = false, unique = true, length = 150)
     private String name;
@@ -38,4 +39,10 @@ public class Organization {
     @ManyToMany(mappedBy = "organizations")
     @Builder.Default
     private Set<User> members = new HashSet<>();
+
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
 }
