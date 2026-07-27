@@ -45,13 +45,14 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/refresh", "/api/auth/logout").permitAll()
+                        .requestMatchers("/api/auth/me", "/api/auth/change-password").authenticated()
                         .requestMatchers("/swagger",
                                 "/swagger/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/admin/**").authenticated()
+                        .requestMatchers("/api/user/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

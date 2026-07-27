@@ -92,4 +92,16 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, ex.getMessage());
 
     }
+
+    @ExceptionHandler(PermissionAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handlePermissionAlreadyExists(PermissionAlreadyExistsException ex) {
+        return build(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(OrganizationHasActiveMembersException.class)
+    public ResponseEntity<ErrorResponse> handleOrgHasActiveMembers(OrganizationHasActiveMembersException ex) {
+        return build(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+
 }

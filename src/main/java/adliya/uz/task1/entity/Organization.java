@@ -1,6 +1,5 @@
 package adliya.uz.task1.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +29,10 @@ public class Organization {
 
     @Column(length = 500)
     private String description;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean enabled = true;
 
     @Column(nullable = false, updatable = false)
     @Builder.Default
