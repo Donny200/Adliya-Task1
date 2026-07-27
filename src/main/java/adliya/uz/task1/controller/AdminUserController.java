@@ -61,3 +61,4 @@ public class AdminUserController {
         return ResponseEntity.ok("Org admin deactivated successfully.");
     }
 }
+

@@ -100,5 +100,6 @@ public class AuthController {
         authService.changePassword(request);
         return ResponseEntity.ok("Password changed successfully.");
     }
+    
 
 }
