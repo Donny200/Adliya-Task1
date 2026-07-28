@@ -80,4 +80,16 @@ public class OrganizationService {
         org.setEnabled(false);
         organizationRepository.save(org);
     }
+
+    public List<Organization> getAllPublic() {
+        return organizationRepository.findAllByEnabledTrue();
+    }
+
+    public Organization getPublicById(Long id) {
+        Organization org = getById(id);
+        if (!Boolean.TRUE.equals(org.getEnabled())) {
+            throw new ResourceNotFoundException("Organization not found, ID: " + id);
+        }
+        return org;
+    }
 }
