@@ -53,6 +53,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/admin/**").authenticated()
                         .requestMatchers("/api/user/**").authenticated()
+                        .requestMatchers("/api/public/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
